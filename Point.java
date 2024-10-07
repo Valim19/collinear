@@ -1,26 +1,61 @@
+import edu.princeton.cs.algs4.StdDraw;
+
 import java.util.Comparator;
 
 public class Point implements Comparable<Point> {
-    // constructs the point (x, y)
-    public Point(int x, int y) {
+    private final int x;
+    private final int y;
 
+    public Point(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
-    // draws this point
-    public void   draw()
+    public void draw() {
+        StdDraw.point(x, y);
+    }
 
-    // draws the line segment from this point to that point
-    public void   drawTo(Point that)
+    public void drawTo(Point that) {
+        StdDraw.line(this.x, this.y, that.x, that.y);
+    }
 
-    // string representation
-    public String toString()
+    public double slopeTo(Point that) {
+        if (this.x == that.x)
+            if (this.y == that.y) return Double.NEGATIVE_INFINITY;
+            else return Double.POSITIVE_INFINITY;
 
-    // compare two points by y-coordinates, breaking ties by x-coordinates
-    public int               compareTo(Point that)
+        if (this.y == that.y) return 0.0;
 
-    // the slope between this point and that point
-    public double            slopeTo(Point that)
+        return ((double) (that.y - this.y) / (double) (that.x - this.x));
+    }
 
-    // compare two points by slopes they make with this point
-    public Comparator<Point> slopeOrder()
+    public int compareTo(Point that) {
+        int differenceY = this.y - that.y;
+
+        if (differenceY != 0) return differenceY;
+        else return (this.x - that.y);
+    }
+
+    public String toString() {
+        return "(" + x + "," + y + ")";
+    }
+
+    public Comparator<Point> slopeOrder() {
+        return new BySlope(this);
+    }
+
+    private static class BySlope implements Comparator<Point> {
+        private final Point p;
+
+        public BySlope(Point p) {
+            this.p = p;
+        }
+
+        public int compare(Point p1, Point p2) {
+            double slopeTo1 = this.p.slopeTo(p1);
+            double slopeTo2 = this.p.slopeTo(p2);
+
+            return Double.compare(slopeTo1, slopeTo2);
+        }
+    }
 }
