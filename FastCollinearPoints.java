@@ -1,20 +1,20 @@
 import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.Arrays;
-import java.util.Stack;
 
 public class FastCollinearPoints {
     private int segmentCount;
     private LineSegment[] collinearSegments;
-    private Segment[] collinearSegmentsInternal;
+    private Point[][] collinearSegmentsInternal;
 
     public FastCollinearPoints(Point[] points) {
         validateInput(points);
 
         segmentCount = 0;
         collinearSegments = new LineSegment[points.length];
-        collinearSegmentsInternal = new Segment[points.length];
+        collinearSegmentsInternal = new Point[points.length][2];
 
         for (Point p : points) {
             Point[] slopesToP = getSlopesTo(p, points);
@@ -40,17 +40,13 @@ public class FastCollinearPoints {
         return Arrays.copyOfRange(collinearSegments, 0, numberOfSegments());
     }
 
-    private boolean isIncluded(Segment s) {
-        for (int i = 0; i < segmentCount; i++)
-            if (s.equals(collinearSegmentsInternal[i]))
+    private boolean isIncluded(Point[] segment) {
+        for (int i = 0; i < segmentCount; i++) {
+            if (Arrays.equals(segment, collinearSegmentsInternal[i])) {
                 return true;
-
+            }
+        }
         return false;
-    }
-
-    private void printArray(Object[] arr) {
-        for (Object x : arr)
-            StdOut.println(x);
     }
 
     private Point[] findCollinearSequence(Point p, Point q, Point[] candidatePoints) {
@@ -58,26 +54,32 @@ public class FastCollinearPoints {
         collinearPoints.push(p);
         collinearPoints.push(q);
 
-        for (Point r : candidatePoints)
-            if (areCollinear(p, collinearPoints.peek(), r))
-                collinearPoints.push(r);
-            else
-                break;
+        for (Point r : candidatePoints) {
+            if (areCollinear(p, collinearPoints.peek(), r)) collinearPoints.push(r);
+            else break;
+        }
 
-        return collinearPoints.toArray(new Point[0]);
+        return stackToArray(collinearPoints);
     }
 
-    private void addSegment(Stack<Point> collinearPoints) {
-        addSegment(collinearPoints.toArray(new Point[0]));
+    private Point[] stackToArray(Stack<Point> stack) {
+        Point[] array = new Point[stack.size()];
+        int index = 0;
+
+        for (Point point : stack) {
+            array[index++] = point;
+        }
+
+        return array;
     }
 
     private void addSegment(Point[] ps) {
         Arrays.sort(ps);
-        Segment s = new Segment(ps[0], ps[ps.length - 1]);
+        Point[] segment = new Point[] { ps[0], ps[ps.length - 1] };
 
-        if (!isIncluded(s)) {
-            collinearSegmentsInternal[segmentCount] = s;
-            collinearSegments[segmentCount] = new LineSegment(s.minPoint, s.maxPoint);
+        if (!isIncluded(segment)) {
+            collinearSegmentsInternal[segmentCount] = segment;
+            collinearSegments[segmentCount] = new LineSegment(segment[0], segment[1]);
             segmentCount++;
         }
     }
@@ -119,18 +121,4 @@ public class FastCollinearPoints {
 
         return Arrays.copyOfRange(slopesToP, 1, slopesToP.length);
     }
-
-    private class Segment {
-        public Point minPoint, maxPoint;
-
-        public Segment(Point minPoint, Point maxPoint) {
-            this.minPoint = minPoint;
-            this.maxPoint = maxPoint;
-        }
-
-        public boolean equals(Segment other) {
-            return ((minPoint.compareTo(other.minPoint) == 0) && (maxPoint.compareTo(other.maxPoint) == 0));
-        }
-    }
-
 }

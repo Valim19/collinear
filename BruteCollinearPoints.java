@@ -4,7 +4,7 @@ public class BruteCollinearPoints {
     private int segmentsCounter;
     private LineSegment[] lineSegments;
 
-    public BruteCollinearPoints (Point[] points) {
+    public BruteCollinearPoints(Point[] points) {
         validateInput(points);
 
         segmentsCounter = 0;
@@ -17,8 +17,8 @@ public class BruteCollinearPoints {
                     Point q = points[j];
                     Point r = points[k];
 
-                    if (areCollinear(p, q, r)){
-                        for (int t = i + 3; t < points.length; t++){
+                    if (areCollinear(p, q, r)) {
+                        for (int t = i + 3; t < points.length; t++) {
                             Point s = points[t];
                             if (areCollinear(p, q, s)) addSegment(p, q, r, s);
                         }
@@ -40,8 +40,11 @@ public class BruteCollinearPoints {
         Arrays.sort(collinearPoints);
         Point minPoint = collinearPoints[0];
         Point maxPoint = collinearPoints[3];
-        lineSegments[segmentsCounter++] = new LineSegment(minPoint, maxPoint);
+
+        if (segmentsCounter < lineSegments.length) lineSegments[segmentsCounter++] = new LineSegment(minPoint, maxPoint);
+        else throw new IllegalStateException("Exceeded maximum number of line segments");
     }
+
 
     private void validateInput(Point[] points) {
         if (points == null) throw new IllegalArgumentException("Points cannot be null");
