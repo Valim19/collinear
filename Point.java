@@ -1,5 +1,4 @@
 import edu.princeton.cs.algs4.StdDraw;
-
 import java.util.Comparator;
 
 public class Point implements Comparable<Point> {
@@ -44,18 +43,12 @@ public class Point implements Comparable<Point> {
         return new BySlope(this);
     }
 
-    private static class BySlope implements Comparator<Point> {
-        private final Point p;
-
-        public BySlope(Point p) {
-            this.p = p;
-        }
-
+    private record BySlope(Point p) implements Comparator<Point> {
         public int compare(Point p1, Point p2) {
-            double slopeTo1 = this.p.slopeTo(p1);
-            double slopeTo2 = this.p.slopeTo(p2);
+                double slopeTo1 = this.p.slopeTo(p1);
+                double slopeTo2 = this.p.slopeTo(p2);
 
-            return Double.compare(slopeTo1, slopeTo2);
+                return Double.compare(slopeTo1, slopeTo2);
+            }
         }
-    }
 }

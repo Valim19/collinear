@@ -2,10 +2,6 @@ public class LineSegment {
     private final Point p;
     private final Point q;
 
-    /**
-     * @throws NullPointerException if either <tt>p</tt> or <tt>q</tt>
-     *         is <tt>null</tt>
-     */
     public LineSegment(Point p, Point q) {
         if (p == null || q == null) {
             throw new NullPointerException("argument is null");
@@ -22,9 +18,6 @@ public class LineSegment {
         return p + " -> " + q;
     }
 
-    /**
-     * @throws UnsupportedOperationException if called
-     */
     public int hashCode() {
         throw new UnsupportedOperationException();
     }
