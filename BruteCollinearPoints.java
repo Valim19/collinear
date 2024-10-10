@@ -1,35 +1,36 @@
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdOut;
+
 import java.util.Arrays;
 
 public class BruteCollinearPoints {
-    private int segmentsCounter;
+
+    private int numSegments;
     private LineSegment[] lineSegments;
 
     public BruteCollinearPoints(Point[] points) {
         validateInput(points);
 
-        segmentsCounter = 0;
+        numSegments = 0;
         lineSegments = new LineSegment[points.length];
 
         for (int i = 0; i < points.length; i++)
-            for (int j = i + 1; j < points.length; j++)
-                for (int k = i + 2; k < points.length; k++) {
+            for (int j = i+1; j < points.length; j++)
+                for (int k = j+1; k < points.length; k++) {
                     Point p = points[i];
                     Point q = points[j];
                     Point r = points[k];
 
-                    if (areCollinear(p, q, r)) {
-                        for (int t = i + 3; t < points.length; t++) {
+                    if (areCollinear(p, q, r))
+                        // If they are collinear, we look for a forth one
+                        for (int t = k+1; t < points.length; t++) {
                             Point s = points[t];
                             if (areCollinear(p, q, s)) addSegment(p, q, r, s);
                         }
-                    }
                 }
-    }
 
-    public int numberOfSegments() {
-        return segmentsCounter;
     }
-
+    public int numberOfSegments() { return numSegments; }
     public LineSegment[] segments() {
         return Arrays.copyOfRange(lineSegments, 0, numberOfSegments());
     }
@@ -41,24 +42,38 @@ public class BruteCollinearPoints {
         Point minPoint = collinearPoints[0];
         Point maxPoint = collinearPoints[3];
 
-        if (segmentsCounter < lineSegments.length) lineSegments[segmentsCounter++] = new LineSegment(minPoint, maxPoint);
-        else throw new IllegalStateException("Exceeded maximum number of line segments");
+        lineSegments[numSegments++] = new LineSegment(minPoint, maxPoint);
     }
 
+    public static void main(String[] args) {
+        In in = new In(args[0]);
+        int n = in.readInt();
+        Point[] points = new Point[n];
+
+        for (int i = 0; i < n; i++) {
+            int x = in.readInt();
+            int y = in.readInt();
+            points[i] = new Point(x, y);
+        }
+
+        BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+        for (LineSegment segment : collinear.segments()) {
+            StdOut.println(segment);
+        }
+    }
 
     private void validateInput(Point[] points) {
-        if (points == null) throw new IllegalArgumentException("Points cannot be null");
-
-        for (Point point : points)
-            if (point == null) throw new IllegalArgumentException("Point cannot be null");
+        if (points == null) throw new IllegalArgumentException("The input argument is null");
+        for (Point point : points) if (point == null) throw new IllegalArgumentException("The input contains null points");
 
         for (int i = 0; i < points.length; i++)
-            for (int j = i + 1; j < points.length; j++)
+            for (int j = i+1; j < points.length; j++)
                 if (points[i].compareTo(points[j]) == 0)
-                    throw new IllegalArgumentException("Points cannot be repeated");
+                    throw new IllegalArgumentException("The input contains repeated points");
+
     }
 
-    private boolean areCollinear(Point p, Point q, Point r) {
-        return (Double.compare(p.slopeTo(q), p.slopeTo(r)) == 0);
+    private boolean areCollinear(Point p1, Point p2, Point p3) {
+        return (Double.compare(p1.slopeTo(p2), p1.slopeTo(p3)) == 0);
     }
 }
